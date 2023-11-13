@@ -1,0 +1,7 @@
+name: Goproxy GitHub Cache
+description: Goproxy using GitHub Actions Cache
+runs:
+  using: composite
+  steps:
+    - run: echo TODO
+      shell: bash
