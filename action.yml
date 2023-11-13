@@ -1,7 +1,13 @@
 name: Goproxy GitHub Cache
 description: Goproxy using GitHub Actions Cache
+env:
+  PROXY_VERSION: ${{github.action_ref}}
 runs:
   using: composite
   steps:
-    - run: echo TODO
+    - run: wget https://github.com/jchadwick-buf/goproxy-github-cache/releases/download/${{env.PROXY_VERSION}}/proxy-${{runner.os}}-${{runner.arch}}${{runner.os == 'Windows' && '.exe' || ''}}
+      shell: bash
+    - run: proxy-${{runner.os}}-${{runner.arch}}${{runner.os == 'Windows' && '.exe' || ''}} &
+      shell: bash
+    - run: echo "GOPROXY=http://localhost:8123,direct" >> $GITHUB_ENV
       shell: bash
