@@ -30,6 +30,9 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: build
-      - name: Debug
-        shell: bash
-        run: find .
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          files: proxy-*
