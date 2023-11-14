@@ -18,4 +18,4 @@ jobs:
         go-version: '^1.21.1'
         cache: false
     - uses: ./
-    - run: go build -v ./cmd/proxy
+    - run: go install -v github.com/rclone/rclone@latest
