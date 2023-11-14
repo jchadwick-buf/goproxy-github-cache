@@ -3,11 +3,26 @@ description: Goproxy using GitHub Actions Cache
 runs:
   using: composite
   steps:
-    - run: wget https://github.com/jchadwick-buf/goproxy-github-cache/releases/download/${{env.PROXY_VERSION}}/proxy-${{runner.os}}-${{runner.arch}}${{runner.os == 'Windows' && '.exe' || ''}}
+    # If not running a release version, build proxy
+    - uses: actions/setup-go@v4
+      with:
+        go-version: '^1.21.1'
+      if: ${{ !startsWith(github.action_ref, 'v') }}
+    - run: |
+        cd ${{ github.action_path }}
+        go build -o "${{ github.workspace }}/goproxy-github-cache" ./cmd/proxy
+        cd ${{ github.workspace }}
+      shell: bash
+      if: ${{ !startsWith(github.action_ref, 'v') }}
+    # If running a release version, download build
+    - run: |
+        curl -sL https://github.com/jchadwick-buf/goproxy-github-cache/releases/download/$VERSION/proxy-${{runner.os}}-${{runner.arch}}${{runner.os == 'Windows' && '.exe' || ''}} -o goproxy-github-cache
+        chmod +x goproxy-github-cache
       shell: bash
       env:
-        PROXY_VERSION: ${{github.action_ref || "v0.1.0"}}
-    - run: proxy-${{runner.os}}-${{runner.arch}}${{runner.os == 'Windows' && '.exe' || ''}} &
+        VERSION: ${{github.action_ref}}
+      if: ${{ startsWith(github.action_ref, 'v') }}
+    - run: ./goproxy-github-cache &
       shell: bash
     - run: echo "GOPROXY=http://localhost:8123,direct" >> $GITHUB_ENV
       shell: bash
