@@ -4,7 +4,6 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/bufbuild/httplb"
@@ -16,9 +15,7 @@ func main() {
 	listen := flag.String("listen", ":8123", "address to listen on")
 	flag.Parse()
 	client := httplb.NewClient()
-	token := os.Getenv("ACTIONS_RUNTIME_TOKEN")
-	url := os.Getenv("ACTIONS_CACHE_URL")
-	cache, err := actionscache.New(token, url, actionscache.Opt{
+	cache, err := actionscache.TryEnv(actionscache.Opt{
 		Client:      client.Client,
 		Timeout:     10 * time.Second,
 		BackoffPool: &actionscache.BackoffPool{},

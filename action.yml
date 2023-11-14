@@ -3,18 +3,24 @@ description: Goproxy using GitHub Actions Cache
 runs:
   using: composite
   steps:
+    - name: Export GitHub Actions cache environment variables
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
     # If not running a release version, build proxy
     - uses: actions/setup-go@v4
       with:
         go-version: '^1.21.1'
         cache: false
       if: ${{ !startsWith(github.action_ref, 'v') }}
-    - run: |
-        cd ${{ github.action_path }}
+    - run:
         go build -o "${{ github.workspace }}/goproxy-github-cache" ./cmd/proxy
-        cd ${{ github.workspace }}
-      shell: bash
+      working-directory: ${{ github.action_path }}
       if: ${{ !startsWith(github.action_ref, 'v') }}
+
     # If running a release version, download build
     - run: |
         curl -sL https://github.com/jchadwick-buf/goproxy-github-cache/releases/download/$VERSION/proxy-${{runner.os}}-${{runner.arch}}${{runner.os == 'Windows' && '.exe' || ''}} -o goproxy-github-cache
@@ -23,6 +29,7 @@ runs:
       env:
         VERSION: ${{github.action_ref}}
       if: ${{ startsWith(github.action_ref, 'v') }}
+
     - run: ./goproxy-github-cache &
       shell: bash
     - run: echo "GOPROXY=http://localhost:8123,direct" >> $GITHUB_ENV
