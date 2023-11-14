@@ -16,5 +16,5 @@ jobs:
     - uses: actions/setup-go@v4
       with:
         go-version: '^1.21.1'
-    - uses: jchadwick-buf/goproxy-github-cache@v0.1.0
+    - uses: ./
     - run: go build -v
