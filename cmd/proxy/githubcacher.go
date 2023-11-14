@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"io/fs"
+	"log"
 
 	"github.com/goproxy/goproxy"
 	actionscache "github.com/tonistiigi/go-actions-cache"
@@ -25,6 +26,7 @@ func newGithubCacher(github *actionscache.Cache) goproxy.Cacher {
 func (cache *githubCacher) Get(ctx context.Context, name string) (io.ReadCloser, error) {
 	entry, err := cache.github.Load(ctx, githubCacheKey(name))
 	if err != nil {
+		log.Printf("error loading cache: %q", name)
 		return nil, err
 	}
 	if entry == nil {
@@ -37,6 +39,7 @@ func (cache *githubCacher) Get(ctx context.Context, name string) (io.ReadCloser,
 func (cache *githubCacher) Put(ctx context.Context, name string, content io.ReadSeeker) error {
 	blob, err := newReaderBlob(content)
 	if err != nil {
+		log.Printf("error saving cache: %q", name)
 		return err
 	}
 	return cache.github.Save(ctx, githubCacheKey(name), blob)
