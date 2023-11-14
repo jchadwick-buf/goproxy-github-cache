@@ -19,6 +19,7 @@ runs:
     - run:
         go build -o "${{ github.workspace }}/goproxy-github-cache" ./cmd/proxy
       working-directory: ${{ github.action_path }}
+      shell: bash
       if: ${{ !startsWith(github.action_ref, 'v') }}
 
     # If running a release version, download build
