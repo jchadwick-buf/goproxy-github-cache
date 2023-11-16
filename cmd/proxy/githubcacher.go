@@ -24,6 +24,7 @@ func newGithubCacher(github *actionscache.Cache) goproxy.Cacher {
 
 // Get implements goproxy.Cacher.
 func (cache *githubCacher) Get(ctx context.Context, name string) (io.ReadCloser, error) {
+	log.Printf("loading key: %v\n", name)
 	entry, err := cache.github.Load(ctx, githubCacheKey(name))
 	if err != nil {
 		log.Printf("error loading cache: %q", name)
@@ -37,12 +38,16 @@ func (cache *githubCacher) Get(ctx context.Context, name string) (io.ReadCloser,
 
 // Put implements goproxy.Cacher.
 func (cache *githubCacher) Put(ctx context.Context, name string, content io.ReadSeeker) error {
+	log.Printf("saving key: %v\n", name)
 	blob, err := newReaderBlob(content)
 	if err != nil {
-		log.Printf("error saving cache: %q", name)
-		return err
+		log.Printf("error saving cache: %q: %v", name, err)
+		return nil
 	}
-	return cache.github.Save(ctx, githubCacheKey(name), blob)
+	if err := cache.github.Save(ctx, githubCacheKey(name), blob); err != nil {
+		log.Printf("error saving cache %q: %v", name, err)
+	}
+	return nil
 }
 
 func githubCacheKey(name string) string {

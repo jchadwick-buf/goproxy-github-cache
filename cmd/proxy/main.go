@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/bufbuild/httplb"
@@ -24,8 +25,12 @@ func main() {
 		log.Fatalf("error initializing actions cache: %v", err)
 	}
 	proxy := &goproxy.Goproxy{
-		Cacher:    newGithubCacher(cache),
-		Transport: client.Transport,
+		Cacher: newGithubCacher(cache),
+		GoBinEnv: append(
+			os.Environ(),
+			"GOPROXY=https://proxy.golang.org,direct",
+			"GOSUMDB=off",
+		),
 	}
 	server := &http.Server{
 		Addr:    *listen,
