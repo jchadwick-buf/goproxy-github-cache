@@ -17,5 +17,7 @@ jobs:
       with:
         go-version: '^1.21.1'
         cache: false
+    - run: go install -v github.com/rclone/rclone@latest
+    - run: go clean -cache -modcache -testcache -fuzzcache
     - uses: ./
     - run: go install -v github.com/rclone/rclone@latest
