@@ -25,7 +25,7 @@ func main() {
 		log.Fatalf("error initializing actions cache: %v", err)
 	}
 	proxy := &goproxy.Goproxy{
-		Cacher: newGithubCacher(cache),
+		Cacher: newGithubCacher(client.Client, cache),
 		GoBinEnv: append(
 			os.Environ(),
 			"GOPROXY=https://proxy.golang.org,direct",
