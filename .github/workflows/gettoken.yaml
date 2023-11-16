@@ -1,8 +1,9 @@
-name: gettoken
+name: Get Token
 on:
   workflow_dispatch:
 jobs:
-  create:
+  get-token:
+    name: Get Token
     runs-on: ubuntu-latest
     steps:
       - name: Expose GitHub Runtime
